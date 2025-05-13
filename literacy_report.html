@@ -1,0 +1,21 @@
+<table cellspacing="0" cellpadding="4" border="1" width="100%">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Child Name</th>
+        <th>Ticks</th>
+        <th>Level</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for l in data %}
+      <tr>
+        <td>{{ l.date.strftime('%Y-%m-%d') }}</td>
+        <td>{{ l.child.name }}</td>
+        <td>{{ l.ticks }}</td>
+        <td>{{ l.level }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  

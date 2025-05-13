@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h3>New Issue</h3>
+  <form method="POST">
+    {{ issue_form.hidden_tag() }}
+    <div class="form-group">
+      {{ issue_form.date.label }} {{ issue_form.date(class="form-control") }}
+    </div>
+    <div class="form-group">
+      {{ issue_form.findings.label }} {{ issue_form.findings(class="form-control") }}
+    </div>
+    <div class="form-group">
+      {{ issue_form.child_id.label }} {{ issue_form.child_id(class="form-control") }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+{% endblock %}

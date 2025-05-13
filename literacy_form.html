@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h3>New Literacy Assessment</h3>
+  <form method="POST">
+    {{ literacy_form.hidden_tag() }}
+    <div class="form-group">
+      {{ literacy_form.date.label }} {{ literacy_form.date(class="form-control") }}
+    </div>
+    <div class="form-group">
+      {{ literacy_form.findings.label }} {{ literacy_form.findings(class="form-control") }}
+    </div>
+    <div class="form-group">
+      {{ literacy_form.child_id.label }} {{ literacy_form.child_id(class="form-control") }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+{% endblock %}

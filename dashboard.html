@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+  <h1 class="mb-4">Dashboard</h1>
+  <!-- Metrics cards -->
+  <div class="row">
+    {% for label, count, icon in [
+          ('Children', total_children, 'fa-child'),
+          ('Home Visits', total_visits, 'fa-home'),
+          ('Vulnerabilities', total_vulns, 'fa-shield-alt'),
+          ('Literacy Assessments', total_literacies, 'fa-book'),
+          ('Open Issues', total_issues, 'fa-exclamation-triangle')
+        ] %}
+    <div class="col-md-2 mb-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fas {{ icon }} fa-2x mb-2"></i>
+          <h5 class="card-title">{{ count }}</h5>
+          <p class="card-text">{{ label }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Updated Charts Section -->
+    <div class="row">
+      <div class="col-md-4">
+        <canvas id="visitsChart"></canvas>
+      </div>
+      <div class="col-md-4">
+        <canvas id="vulnChart"></canvas>
+      </div>
+      <div class="col-md46">
+        <canvas id="litChart"></canvas>
+      </div>
+    </div>
+
+  <!-- Recent Records Tables -->
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header">Recent Visits</div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead><tr><th>Date</th><th>Child</th><th>Findings</th></tr></thead>
+            <tbody>
+            {% for v in recent_visits %}
+              <tr>
+                <td>{{ v.date.strftime('%Y-%m-%d') }}</td>
+                <td>{{ v.child.name }}</td>
+                <td>{{ v.findings|truncate(30) }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header">Recent Vulnerability Assessments</div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead><tr><th>Date</th><th>Child</th><th>Score</th></tr></thead>
+            <tbody>
+            {% for v in recent_vulns %}
+              <tr>
+                <td>{{ v.date.strftime('%Y-%m-%d') }}</td>
+                <td>{{ v.child.name }}</td>
+                <td>{{ v.score }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Literacy & Issues -->
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header">Recent Literacy Assessments</div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead><tr><th>Date</th><th>Child</th><th>Level</th></tr></thead>
+            <tbody>
+            {% for l in recent_literacies %}
+              <tr>
+                <td>{{ l.date.strftime('%Y-%m-%d') }}</td>
+                <td>{{ l.child.name }}</td>
+                <td>{{ l.level }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header">Recent Issues</div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead><tr><th>Opened</th><th>Child</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for i in recent_issues %}
+              <tr>
+                <td>{{ i.created_at.strftime('%Y-%m-%d') }}</td>
+                <td>{{ i.child.name }}</td>
+                <td>{{ i.status }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const visitsData = JSON.parse('{{ visits|tojson }}');
+  const vulnsData = JSON.parse('{{ vulns|tojson }}');
+  const litsData = JSON.parse('{{ lits|tojson }}');
+  
+  // Home Visits Line Chart
+new Chart(document.getElementById('visitsChart'), {
+  type: 'line',
+  data: {
+    labels: visitsData.map(v => v.date),
+    datasets: [{
+      label: 'Home Visits',
+      data: visitsData.map(v => v.count),
+      borderColor: 'rgba(75, 192, 192, 1)',
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      borderWidth: 2,
+      fill: true
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: true },
+      tooltip: { mode: 'index', intersect: false }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Month' } },
+      y: { title: { display: true, text: 'Count' } }
+    }
+  }
+});
+
+// Vulnerability Bar Chart
+new Chart(document.getElementById('vulnChart'), {
+  type: 'bar',
+  data: {
+    labels: vulnsData.map(v => v.date),
+    datasets: [{
+      label: 'Average Vulnerability Score',
+      data: vulnsData.map(v => v.score),
+      backgroundColor: 'rgba(255, 99, 132, 0.2)',
+      borderColor: 'rgba(255, 99, 132, 1)',
+      borderWidth: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: true },
+      tooltip: { mode: 'index', intersect: false }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Month' } },
+      y: { title: { display: true, text: 'Score' } }
+    }
+  }
+});
+
+// Literacy Bar Chart
+new Chart(document.getElementById('litChart'), {
+  type: 'bar',
+  data: {
+    labels: litsData.map(l => l.date),
+    datasets: [{
+      label: 'Total Ticks',
+      data: litsData.map(l => l.ticks),
+      backgroundColor: 'rgba(54, 162, 235, 0.2)',
+      borderColor: 'rgba(54, 162, 235, 1)',
+      borderWidth: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: true },
+      tooltip: { mode: 'index', intersect: false }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Month' } },
+      y: { title: { display: true, text: 'Ticks' } }
+    }
+  }
+});
+</script>
+{% endblock content %}

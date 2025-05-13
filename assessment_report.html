@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --secondary-green: #81C784;
+            --accent-green: #C8E6C9;
+        }
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        .page-break {
+            page-break-before: always;
+            padding-top: 40px;
+        }
+        h1 {
+            color: var(--primary-green);
+            border-bottom: 3px solid var(--secondary-green);
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        h2 {
+            color: var(--primary-green);
+            background-color: var(--accent-green);
+            padding: 8px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .detail-section {
+            border-left: 4px solid var(--secondary-green);
+            padding-left: 15px;
+            margin: 15px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        th {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        .checkmark {
+            color: var(--primary-green);
+            font-weight: bold;
+        }
+        .header-date {
+            text-align: right;
+            color: var(--primary-green);
+            margin-bottom: 30px;
+        }
+        .total-box {
+            background-color: var(--accent-green);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Page 1 -->
+    <div>
+        <p class="header-date">{{ data.report_date }}</p>
+        <h1>OXFORD READING CRITERION SCALE: GRADE SIX</h1>
+        
+        <div class="detail-section">
+            <h2>Assessor's Details</h2>
+            <p><strong>Date of Assessment:</strong> {{ data.assessment_date }}</p>
+            <p><strong>Assessor ID:</strong> {{ data.assessor.id }}</p>
+            <p><strong>Assessor Name:</strong> {{ data.assessor.name }}</p>
+            <p><strong>Assessor Gender:</strong> {{ data.assessor.gender }}</p>
+            <p><strong>Supervisor:</strong> {{ data.assessor.supervisor }}</p>
+        </div>
+
+        <div class="detail-section">
+            <h2>Class Teacher's Details</h2>
+            <p><strong>Teacher ID:</strong> {{ data.teacher.id }}</p>
+            <p><strong>Name:</strong> {{ data.teacher.name }}</p>
+            <p><strong>Supervisor:</strong> {{ data.teacher.supervisor }}</p>
+        </div>
+
+        <div class="detail-section">
+            <h2>Child Details</h2>
+            <p><strong>Child ID:</strong> {{ data.child.id }}</p>
+            <p><strong>Name:</strong> {{ data.child.name }}</p>
+            <p><strong>Grade:</strong> {{ data.child.grade }}</p>
+            <p><strong>School:</strong> {{ data.child.school }}</p>
+        </div>
+    </div>
+
+    <!-- Page 2 -->
+    <div class="page-break">
+        <h2>Assessment Criteria</h2>
+        {% for criterion in data.criteria[0:22] %}
+        <div class="criterion-item">
+            <span>Criterion {{ loop.index }} Rating:</span>
+            {% if criterion.passed %}<span class="checkmark">✔</span>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Page 3 -->
+    <div class="page-break">
+        {% for criterion in data.criteria[22:] %}
+        <div class="criterion-item">
+            <span>Criterion {{ loop.index + 22 }} Rating:</span>
+            {% if criterion.passed %}<span class="checkmark">✔</span>{% endif %}
+        </div>
+        {% endfor %}
+        
+        <div class="total-box">
+            <p><strong>Total sight words read:</strong> {{ data.sight_words }}</p>
+        </div>
+
+        <table>
+            <tr>
+                <th>Interpretation</th>
+                <th>Number of Ticks</th>
+            </tr>
+            {% for interpretation in data.interpretations %}
+            <tr>
+                <td>{{ interpretation.label }}</td>
+                <td>{{ interpretation.range }} {% if interpretation.active %}✔{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div class="total-box">
+            <p><strong>Total Ticks:</strong> {{ data.total_ticks }}</p>
+            <p><strong>Assessment Score:</strong> {{ data.assessment_score }}</p>
+        </div>
+    </div>
+</body>
+</html>
